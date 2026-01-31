@@ -1,101 +1,146 @@
-<div id="GENIALLY_PRO_EDITOR" style="font-family: 'Segoe UI', system-ui, sans-serif; background: #121214; padding: 25px; border-radius: 20px; color: #fff; border: 1px solid #333; max-width: 500px; margin: auto;">
-    <h2 style="text-align: center; color: #7ed6df; margin-bottom: 20px; font-weight: 300;">Audio Widget Constructor</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genially Player Configurator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px; }
+        .config-card { background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 500px; border: 1px solid #334155; }
+        h1 { font-size: 24px; color: #38bdf8; text-align: center; margin-bottom: 30px; }
+        .field { margin-bottom: 20px; }
+        label { display: block; font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; font-weight: bold; }
+        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: #38bdf8; color: #0f172a; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; }
+        button:hover { background: #7dd3fc; transform: translateY(-2px); }
+        #output-area { margin-top: 30px; display: none; }
+        textarea { width: 100%; height: 120px; background: #000; color: #4ade80; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid #166534; resize: none; }
+        .copy-hint { font-size: 11px; color: #4ade80; margin-bottom: 5px; display: block; }
+    </style>
+</head>
+<body>
 
-    <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div style="grid-column: span 2;">
-            <label style="font-size: 11px; color: #7ed6df; font-weight: bold;">GITHUB FOLDER URL:</label>
-            <input type="text" id="gh_path" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #000; color: #fff; margin-top: 5px; box-sizing: border-box;" value="https://github.com/gamelehrerin2024-hub/audioplayer/tree/main/audio">
-        </div>
-
-        <div>
-            <label style="font-size: 11px; color: #7ed6df;">ACCENT COLOR:</label>
-            <input type="color" id="accent" value="#7ed6df" style="width: 100%; height: 38px; border: none; cursor: pointer; background: transparent;">
-        </div>
-
-        <div>
-            <label style="font-size: 11px; color: #7ed6df;">LANGUAGE:</label>
-            <select id="lang" style="width: 100%; height: 38px; background: #000; color: #fff; border: 1px solid #444; border-radius: 6px;">
-                <option value="EN">English</option>
-                <option value="DE">Deutsch</option>
-                <option value="RU">Русский</option>
-            </select>
-        </div>
-
-        <button onclick="buildFinalWidget()" style="grid-column: span 2; padding: 14px; background: #7ed6df; color: #000; border: none; border-radius: 8px; font-weight: 800; cursor: pointer; text-transform: uppercase; transition: 0.3s;">Generate Player Code</button>
+<div class="config-card">
+    <h1>🎧 Player Builder</h1>
+    
+    <div class="field">
+        <label>GitHub Audio Folder URL</label>
+        <input type="text" id="gh_path" placeholder="https://github.com/user/repo/tree/main/audio" value="https://github.com/gamelehrerin2024-hub/audioplayer/tree/main/audio">
     </div>
 
-    <div id="res_section" style="display: none; margin-top: 20px; border-top: 1px solid #333; padding-top: 15px;">
-        <label style="font-size: 11px; color: #7ed6df;">COPY & PASTE TO GENIALLY:</label>
-        <textarea id="final_code" readonly style="width: 100%; height: 80px; background: #000; color: #00ffaa; font-family: monospace; font-size: 10px; border: 1px solid #444; padding: 10px; margin-top: 10px; box-sizing: border-box;"></textarea>
+    <div class="field">
+        <label>Player Theme Color</label>
+        <input type="color" id="theme_color" value="#38bdf8">
+    </div>
+
+    <div class="field">
+        <label>Interface Language</label>
+        <select id="ui_lang">
+            <option value="en">English</option>
+            <option value="de">Deutsch</option>
+            <option value="ru">Русский</option>
+        </select>
+    </div>
+
+    <button onclick="generateCode()">GENERATE IFRAME CODE</button>
+
+    <div id="output-area">
+        <label class="copy-hint">✓ Ready! Copy this to Genially (Insert > Others):</label>
+        <textarea id="result_code" readonly></textarea>
     </div>
 </div>
 
 <script>
-function buildFinalWidget() {
-    const url = document.getElementById('gh_path').value.trim();
-    const clr = document.getElementById('accent').value;
-    const lng = document.getElementById('lang').value;
+function generateCode() {
+    const ghUrl = document.getElementById('gh_path').value.trim();
+    const accent = document.getElementById('theme_color').value;
+    const lang = document.getElementById('ui_lang').value;
 
-    const parts = url.replace('https://github.com/', '').split('/');
+    if (!ghUrl) return alert("Please enter GitHub URL");
+
+    // Парсим путь гитхаба
+    const parts = ghUrl.replace('https://github.com/', '').split('/');
     const user = parts[0], repo = parts[1], branch = parts[3], path = parts.slice(4).join('/');
+    
     const api = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
     const raw = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
 
+    // Тексты интерфейса
+    const texts = {
+        en: { playlist: "Playlist", loading: "Loading..." },
+        de: { playlist: "Wiedergabeliste", loading: "Laden..." },
+        ru: { playlist: "Плейлист", loading: "Загрузка..." }
+    };
+
+    // Генерируем HTML самого плеера
     const playerHtml = `
-<div style="width:350px; background:rgba(255,255,255,0.95); backdrop-filter:blur(10px); border-radius:24px; overflow:hidden; font-family:sans-serif; box-shadow:0 15px 35px rgba(0,0,0,0.15); border:1px solid #eee;">
-    <div style="height:130px; background:linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.7)), url('${raw}/cover.jpg') center/cover, #2c3e50; display:flex; align-items:flex-end; padding:20px; position:relative;">
-        <a id="dl" href="#" download style="position:absolute; top:15px; left:15px; background:rgba(255,255,255,0.2); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; text-decoration:none; font-size:14px; backdrop-filter:blur(5px);">⬇</a>
+<div style="width:360px; background:rgba(255,255,255,0.98); border-radius:24px; overflow:hidden; font-family:'Inter', sans-serif; box-shadow:0 15px 45px rgba(0,0,0,0.1); border:1px solid #eee;">
+    <div style="height:140px; background:linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.7)), url('${raw}/cover.jpg') center/cover, #2c3e50; display:flex; align-items:flex-end; padding:20px; position:relative;">
+        <a id="dl" href="#" download style="position:absolute; top:20px; left:20px; text-decoration:none; color:#fff; background:rgba(255,255,255,0.2); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); font-size:16px;">⬇</a>
+        <span style="position:absolute; top:20px; right:20px; color:${accent}; font-size:20px; cursor:default;">❤</span>
         <div style="display:flex; align-items:center; gap:12px; color:#fff; z-index:2;">
-            <div style="width:50px; height:50px; border-radius:12px; background:url('${raw}/cover.jpg') center/cover, #444; border:1px solid rgba(255,255,255,0.3);"></div>
+            <div style="width:55px; height:55px; border-radius:12px; background:url('${raw}/cover.jpg') center/cover, #444; border:1px solid rgba(255,255,255,0.3);"></div>
             <div style="overflow:hidden;">
-                <div id="ti" style="font-weight:bold; font-size:15px; width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">Loading...</div>
-                <div style="font-size:10px; opacity:0.8; text-transform:uppercase;">${lng === 'RU' ? 'Плейлист' : lng === 'DE' ? 'Wiedergabeliste' : 'Playlist'}</div>
+                <div id="ti" style="font-weight:bold; font-size:16px; width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${texts[lang].loading}</div>
+                <div style="font-size:11px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">${texts[lang].playlist}</div>
             </div>
         </div>
     </div>
-    <div style="padding:15px; background:#fff;">
-        <input type="range" id="sk" value="0" style="width:100%; accent-color:${clr}; height:4px; cursor:pointer; margin-bottom:10px;">
+    <div style="padding:20px; background:#fff;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+            <span id="ct" style="font-size:10px; color:#94a3b8; width:35px;">0:00</span>
+            <input type="range" id="sk" value="0" style="flex-grow:1; accent-color:${accent}; height:4px; cursor:pointer;">
+            <span id="dt" style="font-size:10px; color:#94a3b8; width:35px;">0:00</span>
+        </div>
         <div style="display:flex; justify-content:space-between; align-items:center;">
-            <div id="vc" style="position:relative; display:flex; align-items:center; width:20px;">
-                <span style="cursor:pointer; font-size:16px;">🔊</span>
-                <input type="range" id="vl" min="0" max="1" step="0.05" value="0.8" style="width:0; opacity:0; accent-color:${clr}; transition:0.3s; position:absolute; left:22px;">
+            <div id="vc" style="position:relative; display:flex; align-items:center; width:20px; cursor:pointer;">
+                <span style="font-size:18px;">🔊</span>
+                <input type="range" id="vl" min="0" max="1" step="0.05" value="0.8" style="width:0; opacity:0; accent-color:${accent}; transition:0.3s; position:absolute; left:25px;">
             </div>
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button onclick="window.goP()" style="background:none; border:none; font-size:22px; cursor:pointer;">⏮</button>
-                <button id="pb" onclick="window.goT()" style="background:#333; color:#fff; width:48px; height:48px; border-radius:50%; border:none; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;">▶</button>
-                <button onclick="window.goN()" style="background:none; border:none; font-size:22px; cursor:pointer;">⏭</button>
+            <div style="display:flex; align-items:center; gap:15px;">
+                <button onclick="window.pN()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#1e293b;">⏮</button>
+                <button id="pb" onclick="window.pT()" style="background:#1e293b; color:#fff; width:52px; height:52px; border-radius:50%; border:none; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 20px rgba(0,0,0,0.1);">▶</button>
+                <button onclick="window.pX()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#1e293b;">⏭</button>
             </div>
-            <span id="sh" style="cursor:pointer; font-size:16px; color:#ccc;">🔀</span>
+            <span id="sf" style="cursor:pointer; font-size:18px; color:#cbd5e1;">🔀</span>
         </div>
     </div>
     <audio id="au"></audio>
 </div>
 <style>
-#vc:hover #vl { width:60px; opacity:1; }
-input[type=range] { -webkit-appearance:none; outline:none; background:#eee; border-radius:10px; }
+ #vc:hover #vl { width:60px; opacity:1; }
+ input[type=range] { -webkit-appearance:none; outline:none; background:#f1f5f9; border-radius:10px; }
 </style>
 <script>
 (function(){
     const a=document.getElementById('au'), b=document.getElementById('pb'), s=document.getElementById('sk'), t=document.getElementById('ti'), v=document.getElementById('vl'), dl=document.getElementById('dl');
-    let trks=[], cur=0, isS=false;
-    fetch('${api}').then(r=>r.json()).then(data=>{
-        trks=data.filter(f=>f.name.endsWith('.mp3')).map(f=>({n:f.name.replace('.mp3',''), u:f.download_url}));
-        if(trks.length) l(0);
+    let trk=[], cur=0, isS=false;
+    fetch('${api}').then(r=>r.json()).then(d=>{
+        trk=d.filter(f=>f.name.endsWith('.mp3')).map(f=>({n:f.name.replace('.mp3',''), u:f.download_url}));
+        if(trk.length) l(0);
     });
-    function l(i){ cur=i; a.src=trks[i].u; t.innerText=trks[i].n; dl.href=trks[i].u; a.load(); }
-    window.goT=()=>{ if(a.paused){ a.play(); b.innerText='⏸'; } else { a.pause(); b.innerText='▶'; } };
-    window.goN=()=>{ cur=isS?Math.floor(Math.random()*trks.length):(cur+1)%trks.length; l(cur); a.play(); b.innerText='⏸'; };
-    window.goP=()=>{ cur=(cur-1+trks.length)%trks.length; l(cur); a.play(); b.innerText='⏸'; };
-    a.ontimeupdate=()=>{ s.value=(a.currentTime/a.duration)*100||0; };
-    a.onended=()=>window.goN();
+    function l(i){ cur=i; a.src=trk[i].u; t.innerText=trk[i].n; dl.href=trk[i].u; a.load(); }
+    window.pT=()=>{ if(a.paused){ a.play(); b.innerText='⏸'; } else { a.pause(); b.innerText='▶'; } };
+    window.pX=()=>{ cur=isS?Math.floor(Math.random()*trk.length):(cur+1)%trk.length; l(cur); a.play(); b.innerText='⏸'; };
+    window.pN=()=>{ cur=(cur-1+trk.length)%trk.length; l(cur); a.play(); b.innerText='⏸'; };
+    a.ontimeupdate=()=>{ s.value=(a.currentTime/a.duration)*100||0; document.getElementById('ct').innerText=f(a.currentTime); };
+    a.onloadedmetadata=()=>{ document.getElementById('dt').innerText=f(a.duration); };
+    a.onended=()=>window.pX();
     s.oninput=()=>{ a.currentTime=(s.value/100)*a.duration; };
     v.oninput=()=>{ a.volume=v.value; };
-    document.getElementById('sh').onclick=(e)=>{ isS=!isS; e.target.style.color=isS?'${clr}':'#ccc'; };
+    document.getElementById('sf').onclick=(e)=>{ isS=!isS; e.target.style.color=isS?'${accent}':'#cbd5e1'; };
+    function f(s){ let m=Math.floor(s/60), sc=Math.floor(s%60); return m+':'+String(sc).padStart(2,'0'); }
 })();
 <\/script>`;
 
-    const final = `<iframe srcdoc='${playerHtml.replace(/'/g, "&apos;").replace(/<\/script>/g, '<\\/script>')}' width="380" height="340" style="border:none; background:transparent;" allow="autoplay"></iframe>`;
-    document.getElementById('final_code').value = final;
-    document.getElementById('res_section').style.display = 'block';
+    // Формируем финальный iframe код
+    const iframeCode = `<iframe srcdoc='${playerHtml.replace(/'/g, "&apos;").replace(/<\/script>/g, '<\\/script>')}' width="400" height="380" style="border:none; background:transparent;" allow="autoplay"></iframe>`;
+    
+    document.getElementById('result_code').value = iframeCode;
+    document.getElementById('output-area').style.display = 'block';
 }
 </script>
+
+</body>
+</html>

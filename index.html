@@ -3,144 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Genially Player Configurator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <title>Professional Player Builder</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; padding: 40px; }
-        .config-card { background: #1e293b; padding: 30px; border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); width: 100%; max-width: 500px; border: 1px solid #334155; }
-        h1 { font-size: 24px; color: #38bdf8; text-align: center; margin-bottom: 30px; }
-        .field { margin-bottom: 20px; }
-        label { display: block; font-size: 12px; text-transform: uppercase; color: #94a3b8; margin-bottom: 8px; font-weight: bold; }
-        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background: #38bdf8; color: #0f172a; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; font-size: 16px; }
-        button:hover { background: #7dd3fc; transform: translateY(-2px); }
-        #output-area { margin-top: 30px; display: none; }
-        textarea { width: 100%; height: 120px; background: #000; color: #4ade80; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 12px; border: 1px solid #166534; resize: none; }
-        .copy-hint { font-size: 11px; color: #4ade80; margin-bottom: 5px; display: block; }
+        :root { --accent: #38bdf8; --bg: #0f172a; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; padding: 40px; }
+        .editor-container { background: #1e293b; padding: 30px; border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); width: 100%; max-width: 900px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; border: 1px solid #334155; }
+        h1 { grid-column: span 2; text-align: center; color: var(--accent); margin-bottom: 10px; font-weight: 300; letter-spacing: 2px; }
+        .controls { display: flex; flex-direction: column; gap: 15px; }
+        .preview-pane { display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 16px; padding: 20px; border: 2px dashed #334155; }
+        label { font-size: 11px; text-transform: uppercase; color: #94a3b8; font-weight: 600; }
+        input, select { width: 100%; padding: 12px; background: #0f172a; border: 1px solid #334155; border-radius: 8px; color: #fff; margin-top: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 15px; background: var(--accent); color: #0f172a; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 15px; text-transform: uppercase; }
+        button:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        #code-res { grid-column: span 2; margin-top: 20px; }
+        textarea { width: 100%; height: 80px; background: #000; color: #4ade80; border: 1px solid #166534; border-radius: 8px; padding: 10px; font-family: monospace; font-size: 11px; resize: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="config-card">
-    <h1>🎧 Player Builder</h1>
-    
-    <div class="field">
-        <label>GitHub Audio Folder URL</label>
-        <input type="text" id="gh_path" placeholder="https://github.com/user/repo/tree/main/audio" value="https://github.com/gamelehrerin2024-hub/audioplayer/tree/main/audio">
+<h1>🎧 AUDIO PLAYER STUDIO</h1>
+
+<div class="editor-container">
+    <div class="controls">
+        <div>
+            <label>GitHub Folder URL</label>
+            <input type="text" id="gh_path" oninput="updatePreview()" value="https://github.com/gamelehrerin2024-hub/audioplayer/tree/main/audio">
+        </div>
+        <div>
+            <label>Theme Color</label>
+            <input type="color" id="theme_clr" oninput="updatePreview()" value="#38bdf8">
+        </div>
+        <div>
+            <label>Language</label>
+            <select id="lang" onchange="updatePreview()">
+                <option value="en">English</option>
+                <option value="de">Deutsch</option>
+                <option value="ru">Русский</option>
+            </select>
+        </div>
+        <button onclick="copyCode()">Copy Code for Genially</button>
     </div>
 
-    <div class="field">
-        <label>Player Theme Color</label>
-        <input type="color" id="theme_color" value="#38bdf8">
+    <div class="preview-pane">
+        <label style="margin-bottom: 20px;">Live Preview</label>
+        <div id="player-demo"></div>
     </div>
 
-    <div class="field">
-        <label>Interface Language</label>
-        <select id="ui_lang">
-            <option value="en">English</option>
-            <option value="de">Deutsch</option>
-            <option value="ru">Русский</option>
-        </select>
-    </div>
-
-    <button onclick="generateCode()">GENERATE IFRAME CODE</button>
-
-    <div id="output-area">
-        <label class="copy-hint">✓ Ready! Copy this to Genially (Insert > Others):</label>
-        <textarea id="result_code" readonly></textarea>
+    <div id="code-res">
+        <label>Final IFrame Code</label>
+        <textarea id="output_text" readonly></textarea>
     </div>
 </div>
 
 <script>
-function generateCode() {
-    const ghUrl = document.getElementById('gh_path').value.trim();
-    const accent = document.getElementById('theme_color').value;
-    const lang = document.getElementById('ui_lang').value;
+    function updatePreview() {
+        const ghUrl = document.getElementById('gh_path').value;
+        const clr = document.getElementById('theme_clr').value;
+        const lng = document.getElementById('lang').value;
 
-    if (!ghUrl) return alert("Please enter GitHub URL");
+        const parts = ghUrl.replace('https://github.com/', '').split('/');
+        const user = parts[0], repo = parts[1], branch = parts[3] || 'main', path = parts.slice(4).join('/');
+        
+        const api = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
+        const raw = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
 
-    // Парсим путь гитхаба
-    const parts = ghUrl.replace('https://github.com/', '').split('/');
-    const user = parts[0], repo = parts[1], branch = parts[3], path = parts.slice(4).join('/');
-    
-    const api = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
-    const raw = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
+        const texts = {
+            en: { playlist: "Playlist", loading: "Loading..." },
+            de: { playlist: "Wiedergabeliste", loading: "Laden..." },
+            ru: { playlist: "Плейлист", loading: "Загрузка..." }
+        };
 
-    // Тексты интерфейса
-    const texts = {
-        en: { playlist: "Playlist", loading: "Loading..." },
-        de: { playlist: "Wiedergabeliste", loading: "Laden..." },
-        ru: { playlist: "Плейлист", loading: "Загрузка..." }
-    };
-
-    // Генерируем HTML самого плеера
-    const playerHtml = `
-<div style="width:360px; background:rgba(255,255,255,0.98); border-radius:24px; overflow:hidden; font-family:'Inter', sans-serif; box-shadow:0 15px 45px rgba(0,0,0,0.1); border:1px solid #eee;">
-    <div style="height:140px; background:linear-gradient(rgba(0,0,0,0.3),rgba(0,0,0,0.7)), url('${raw}/cover.jpg') center/cover, #2c3e50; display:flex; align-items:flex-end; padding:20px; position:relative;">
-        <a id="dl" href="#" download style="position:absolute; top:20px; left:20px; text-decoration:none; color:#fff; background:rgba(255,255,255,0.2); width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; backdrop-filter:blur(5px); font-size:16px;">⬇</a>
-        <span style="position:absolute; top:20px; right:20px; color:${accent}; font-size:20px; cursor:default;">❤</span>
+        const playerCode = `
+<div style="width:340px; background:rgba(255,255,255,0.9); backdrop-filter:blur(15px); border-radius:24px; overflow:hidden; font-family:sans-serif; box-shadow:0 10px 40px rgba(0,0,0,0.1); border:1px solid rgba(255,255,255,0.4);">
+    <div style="height:130px; background:linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.6)), url('${raw}/cover.jpg') center/cover, #2c3e50; display:flex; align-items:flex-end; padding:15px; position:relative;">
+        <a id="dl" href="#" download style="position:absolute; top:15px; left:15px; background:rgba(255,255,255,0.2); width:30px; height:30px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; text-decoration:none; backdrop-filter:blur(5px);">⬇</a>
+        <div style="position:absolute; top:15px; right:15px; color:${clr}; font-size:20px; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.3)); cursor:pointer;">❤</div>
         <div style="display:flex; align-items:center; gap:12px; color:#fff; z-index:2;">
-            <div style="width:55px; height:55px; border-radius:12px; background:url('${raw}/cover.jpg') center/cover, #444; border:1px solid rgba(255,255,255,0.3);"></div>
-            <div style="overflow:hidden;">
-                <div id="ti" style="font-weight:bold; font-size:16px; width:220px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${texts[lang].loading}</div>
-                <div style="font-size:11px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">${texts[lang].playlist}</div>
+            <div style="width:50px; height:50px; border-radius:12px; background:url('${raw}/cover.jpg') center/cover, #444; border:1px solid rgba(255,255,255,0.3);"></div>
+            <div>
+                <div id="ti" style="font-weight:bold; font-size:15px; width:210px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; text-shadow:0 2px 4px rgba(0,0,0,0.5);">${texts[lng].loading}</div>
+                <div style="font-size:10px; opacity:0.8; text-transform:uppercase; letter-spacing:1px;">${texts[lng].playlist}</div>
             </div>
         </div>
     </div>
-    <div style="padding:20px; background:#fff;">
-        <div style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-            <span id="ct" style="font-size:10px; color:#94a3b8; width:35px;">0:00</span>
-            <input type="range" id="sk" value="0" style="flex-grow:1; accent-color:${accent}; height:4px; cursor:pointer;">
-            <span id="dt" style="font-size:10px; color:#94a3b8; width:35px;">0:00</span>
-        </div>
+    <div style="padding:15px; background:rgba(255,255,255,0.5);">
+        <input type="range" id="sk" value="0" style="width:100%; accent-color:${clr}; height:4px; cursor:pointer; margin-bottom:12px;">
         <div style="display:flex; justify-content:space-between; align-items:center;">
             <div id="vc" style="position:relative; display:flex; align-items:center; width:20px; cursor:pointer;">
-                <span style="font-size:18px;">🔊</span>
-                <input type="range" id="vl" min="0" max="1" step="0.05" value="0.8" style="width:0; opacity:0; accent-color:${accent}; transition:0.3s; position:absolute; left:25px;">
+                <span style="font-size:16px;">🔊</span>
+                <input type="range" id="vl" min="0" max="1" step="0.05" value="0.8" style="width:0; opacity:0; accent-color:${clr}; transition:0.3s; position:absolute; left:22px;">
             </div>
             <div style="display:flex; align-items:center; gap:15px;">
-                <button onclick="window.pN()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#1e293b;">⏮</button>
-                <button id="pb" onclick="window.pT()" style="background:#1e293b; color:#fff; width:52px; height:52px; border-radius:50%; border:none; font-size:24px; cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 10px 20px rgba(0,0,0,0.1);">▶</button>
-                <button onclick="window.pX()" style="background:none; border:none; font-size:28px; cursor:pointer; color:#1e293b;">⏭</button>
+                <button onclick="window.goP()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#333;">⏮</button>
+                <button id="pb" onclick="window.goT()" style="background:#333; color:#fff; width:45px; height:45px; border-radius:50%; border:none; font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;">▶</button>
+                <button onclick="window.goN()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#333;">⏭</button>
             </div>
-            <span id="sf" style="cursor:pointer; font-size:18px; color:#cbd5e1;">🔀</span>
+            <span id="sf" style="cursor:pointer; font-size:16px; color:#aaa;">🔀</span>
         </div>
     </div>
     <audio id="au"></audio>
 </div>
-<style>
- #vc:hover #vl { width:60px; opacity:1; }
- input[type=range] { -webkit-appearance:none; outline:none; background:#f1f5f9; border-radius:10px; }
-</style>
+<style>#vc:hover #vl { width:60px; opacity:1; } input[type=range]{-webkit-appearance:none; background:#ddd; border-radius:10px;}</style>
 <script>
 (function(){
     const a=document.getElementById('au'), b=document.getElementById('pb'), s=document.getElementById('sk'), t=document.getElementById('ti'), v=document.getElementById('vl'), dl=document.getElementById('dl');
-    let trk=[], cur=0, isS=false;
+    let trks=[], cur=0, isS=false;
     fetch('${api}').then(r=>r.json()).then(d=>{
-        trk=d.filter(f=>f.name.endsWith('.mp3')).map(f=>({n:f.name.replace('.mp3',''), u:f.download_url}));
-        if(trk.length) l(0);
+        trks=d.filter(f=>f.name.endsWith('.mp3')).map(f=>({n:f.name.replace('.mp3',''), u:f.download_url}));
+        if(trks.length) l(0);
     });
-    function l(i){ cur=i; a.src=trk[i].u; t.innerText=trk[i].n; dl.href=trk[i].u; a.load(); }
-    window.pT=()=>{ if(a.paused){ a.play(); b.innerText='⏸'; } else { a.pause(); b.innerText='▶'; } };
-    window.pX=()=>{ cur=isS?Math.floor(Math.random()*trk.length):(cur+1)%trk.length; l(cur); a.play(); b.innerText='⏸'; };
-    window.pN=()=>{ cur=(cur-1+trk.length)%trk.length; l(cur); a.play(); b.innerText='⏸'; };
-    a.ontimeupdate=()=>{ s.value=(a.currentTime/a.duration)*100||0; document.getElementById('ct').innerText=f(a.currentTime); };
-    a.onloadedmetadata=()=>{ document.getElementById('dt').innerText=f(a.duration); };
-    a.onended=()=>window.pX();
+    function l(i){ cur=i; a.src=trks[i].u; t.innerText=trks[i].n; dl.href=trks[i].u; a.load(); }
+    window.goT=()=>{ if(a.paused){ a.play(); b.innerText='⏸'; } else { a.pause(); b.innerText='▶'; } };
+    window.goN=()=>{ cur=isS?Math.floor(Math.random()*trks.length):(cur+1)%trks.length; l(cur); a.play(); b.innerText='⏸'; };
+    window.goP=()=>{ cur=(cur-1+trks.length)%trks.length; l(cur); a.play(); b.innerText='⏸'; };
+    a.ontimeupdate=()=>{ s.value=(a.currentTime/a.duration)*100||0; };
+    a.onended=()=>window.goN();
     s.oninput=()=>{ a.currentTime=(s.value/100)*a.duration; };
     v.oninput=()=>{ a.volume=v.value; };
-    document.getElementById('sf').onclick=(e)=>{ isS=!isS; e.target.style.color=isS?'${accent}':'#cbd5e1'; };
-    function f(s){ let m=Math.floor(s/60), sc=Math.floor(s%60); return m+':'+String(sc).padStart(2,'0'); }
+    document.getElementById('sf').onclick=(e)=>{ isS=!isS; e.target.style.color=isS?'${clr}':'#aaa'; };
 })();
 <\/script>`;
 
-    // Формируем финальный iframe код
-    const iframeCode = `<iframe srcdoc='${playerHtml.replace(/'/g, "&apos;").replace(/<\/script>/g, '<\\/script>')}' width="400" height="380" style="border:none; background:transparent;" allow="autoplay"></iframe>`;
-    
-    document.getElementById('result_code').value = iframeCode;
-    document.getElementById('output-area').style.display = 'block';
-}
-</script>
+        const iframe = `<iframe srcdoc='${playerHtml.replace(/'/g, "&apos;").replace(/<\/script>/g, '<\\/script>')}' width="360" height="340" style="border:none; background:transparent;" allow="autoplay"></iframe>`;
+        document.getElementById('player-demo').innerHTML = iframe;
+        document.getElementById('output_text').value = iframe;
+    }
 
+    function copyCode() {
+        const text = document.getElementById('output_text');
+        text.select();
+        document.execCommand('copy');
+        alert("Code copied! Now paste it into Genially (Insert > Others)");
+    }
+
+    updatePreview();
+</script>
 </body>
 </html>

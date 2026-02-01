@@ -3,37 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Audio Studio Ultimate: Custom Background</title>
+    <title>Audio Studio Ultimate Fix</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #38bdf8; --bg-side: #0f172a; --bg-main: #020617; }
         body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', sans-serif; background: var(--bg-main); color: #fff; overflow: hidden; }
-        .app-container { display: flex; height: 100vh; }
-        .sidebar { width: 340px; background: var(--bg-side); padding: 25px; border-right: 1px solid #1e293b; display: flex; flex-direction: column; gap: 12px; z-index: 10; overflow-y: auto; }
-        .sidebar h2 { font-size: 18px; font-weight: 700; color: var(--primary); margin-bottom: 5px; }
+        .app-container { display: flex; height: 100vh; width: 100vw; }
+        
+        /* Левая панель */
+        .sidebar { 
+            width: 340px; min-width: 340px; 
+            background: var(--bg-side); padding: 25px; 
+            border-right: 1px solid #1e293b; 
+            display: flex; flex-direction: column; gap: 12px; 
+            z-index: 100; overflow-y: auto; 
+        }
+        .sidebar h2 { font-size: 18px; font-weight: 700; color: var(--primary); margin: 0 0 5px 0; }
+        
+        /* Поля ввода */
         .field { display: flex; flex-direction: column; gap: 5px; }
         .field label { font-size: 10px; color: #94a3b8; text-transform: uppercase; font-weight: 700; }
-        input[type="text"], select { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; color: #fff; outline: none; font-size: 13px; }
-        input[type="color"] { background: #1e293b; border: 1px solid #334155; border-radius: 8px; height: 35px; cursor: pointer; padding: 4px; width: 100%; }
+        input[type="text"], select { 
+            background: #1e293b; border: 1px solid #334155; 
+            border-radius: 8px; padding: 10px; color: #fff; 
+            outline: none; font-size: 13px; transition: 0.2s;
+        }
+        input[type="text"]:focus { border-color: var(--primary); }
+        input[type="color"] { 
+            background: #1e293b; border: 1px solid #334155; 
+            border-radius: 8px; height: 35px; cursor: pointer; padding: 4px; width: 100%; 
+        }
+        
+        /* Слайдеры */
         input[type=range] { -webkit-appearance: none; width: 100%; height: 5px; background: #334155; border-radius: 5px; }
         input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--primary); border-radius: 50%; cursor: pointer; }
-        .btn-generate { background: linear-gradient(135deg, #38bdf8, #818cf8); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; text-transform: uppercase; margin-top: 10px; }
-        .main-content { flex-grow: 1; position: relative; display: flex; align-items: center; justify-content: center; background-image: radial-gradient(#1e293b 1px, transparent 1px); background-size: 30px 30px; }
+        
+        .btn-generate { 
+            background: linear-gradient(135deg, #38bdf8, #818cf8); 
+            color: white; border: none; padding: 14px; 
+            border-radius: 12px; font-weight: 700; 
+            cursor: pointer; text-transform: uppercase; margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+        }
+
+        /* Правая часть - Предпросмотр */
+        .main-content { 
+            flex-grow: 1; 
+            height: 100vh;
+            display: flex; align-items: center; justify-content: center; 
+            background-color: #020617;
+            background-image: radial-gradient(#1e293b 1px, transparent 1px); 
+            background-size: 30px 30px;
+            position: relative;
+        }
+        #player-wrapper { 
+            display: flex; align-items: center; justify-content: center;
+            transition: transform 0.3s ease;
+        }
     </style>
 </head>
 <body>
 
 <div class="app-container">
     <aside class="sidebar">
-        <h2>Audio Studio v3</h2>
+        <h2>Audio Studio v3.1</h2>
         <div class="field"><label>Картинка фона (URL):</label>
-            <input type="text" id="cfg-bg" placeholder="URL картинки (например, из Pinterest/Unsplash)">
+            <input type="text" id="cfg-bg" placeholder="Вставьте прямую ссылку на картинку">
         </div>
         <div class="field"><label>Цвет темы:</label><input type="color" id="cfg-color" value="#38bdf8"></div>
         <div style="display:flex; align-items:center; gap:8px; font-size:12px; color:#cbd5e1;">
             <input type="checkbox" id="cfg-anim" checked> <label for="cfg-anim" style="cursor:pointer">Хамелеон-эффект</label>
         </div>
-        <div class="field"><label>GitHub Folder URL:</label><input type="text" id="cfg-url" value="https://github.com/deutschlehrerin12345-stack/audioplayer/tree/main/audio"></div>
+        <div class="field"><label>GitHub Folder URL:</label>
+            <input type="text" id="cfg-url" value="https://github.com/deutschlehrerin12345-stack/audioplayer/tree/main/audio">
+        </div>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
              <div class="field"><label>Размер: <span id="scale-val">1.0</span>x</label><input type="range" id="cfg-scale" min="0.5" max="1.2" step="0.05" value="1.0"></div>
              <div class="field"><label>Звук: <span id="vol-val">80</span>%</label><input type="range" id="cfg-vol" min="0" max="1" step="0.1" value="0.8"></div>
@@ -42,7 +85,9 @@
     </aside>
 
     <main class="main-content">
-        <div id="player-wrapper"><div id="player-container"></div></div>
+        <div id="player-wrapper">
+            <div id="player-container"></div>
+        </div>
     </main>
 </div>
 
@@ -65,12 +110,15 @@
             const user = cleanUrl[0], repo = cleanUrl[1], branch = cleanUrl[3] || 'main', path = cleanUrl.slice(4).join('/');
             api = `https://api.github.com/repos/${user}/${repo}/contents/${path}?ref=${branch}`;
             raw = `https://raw.githubusercontent.com/${user}/${repo}/${branch}/${path}`;
-        } catch(e) { console.error("URL error"); }
+        } catch(e) { console.error("URL Parsing Error"); }
+
+        // Если фона нет, ставим градиент
+        const bgStyle = bgUrl ? `url('${bgUrl}') center/cover no-repeat` : `linear-gradient(135deg, #0f172a 0%, #020617 100%)`;
 
         const playerHTML = `
-<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: ${bgUrl ? 'url('+bgUrl+')' : 'transparent'} center/cover no-repeat;">
-    <div id="p-box" style="width:360px; background:rgba(255,255,255,0.4); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:35px; overflow:hidden; font-family:sans-serif; border:1px solid rgba(255,255,255,0.4); box-shadow: 0 10px 30px rgba(0,0,0,0.15);">
-        <div style="height:150px; background:linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.6)), url('${raw}/cover.jpg') center/cover; display:flex; align-items:flex-end; padding:20px;">
+<div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background: ${bgStyle}; margin:0; padding:0;">
+    <div id="p-box" style="width:360px; background:rgba(255,255,255,0.4); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-radius:35px; overflow:hidden; font-family:sans-serif; border:1px solid rgba(255,255,255,0.4); box-shadow: 0 20px 50px rgba(0,0,0,0.3); position:relative;">
+        <div style="height:150px; background:linear-gradient(rgba(0,0,0,0.1),rgba(0,0,0,0.7)), url('${raw}/cover.jpg') center/cover; display:flex; align-items:flex-end; padding:20px;">
             <div class="${isAnim?'cham':''}" style="position:absolute; top:20px; right:20px; font-size:24px; color:${color};">❤</div>
             <div style="display:flex; align-items:center; gap:15px; color:#fff; z-index:2; width:100%;">
                 <div style="width:55px; height:55px; border-radius:15px; background:url('${raw}/cover.jpg') center/cover, #333; border:1px solid rgba(255,255,255,0.4);"></div>
@@ -89,4 +137,80 @@
             </div>
         </div>
         <div style="padding:18px 22px;">
-            <input type="range
+            <input type="range" id="s" value="0" class="${isAnim?'cham-bg':''}" style="width:100%; height:4px; appearance:none; -webkit-appearance:none; background:rgba(255,255,255,0.3); border-radius:5px; cursor:pointer; margin-bottom:15px; accent-color:${color};">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div class="vol-c" style="position:relative; display:flex; align-items:center; color:#111;"><span style="font-size:18px; cursor:pointer;">🔊</span><input type="range" id="vol" min="0" max="1" step="0.05" value="${initVol}" style="width:55px; position:absolute; left:25px; opacity:0; transition:0.3s; pointer-events:none;"></div>
+                <div style="display:flex; align-items:center; gap:14px;">
+                    <button onclick="window.pPr()" style="background:none; border:none; font-size:26px; cursor:pointer; color:#111;">⏮</button>
+                    <button id="pB" onclick="window.pPl()" style="position:relative; background:#111; color:#fff; width:58px; height:58px; border-radius:50%; border:none; font-size:22px; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+                        <span id="pIc">▶</span>
+                        <div id="ldr" style="display:none; position:absolute; width:100%; height:100%; border:3px solid transparent; border-top-color:${color}; border-radius:50%; animation: spin 1s linear infinite;"></div>
+                    </button>
+                    <button onclick="window.pNe()" style="background:none; border:none; font-size:26px; cursor:pointer; color:#111;">⏭</button>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button onclick="window.pDw()" style="background:none; border:none; font-size:20px; cursor:pointer; opacity:0.8; color:#111;">📥</button>
+                    <button id="lT" style="background:none; border:none; font-size:20px; cursor:pointer; opacity:0.8; color:#111;">📜</button>
+                </div>
+            </div>
+        </div>
+        <div id="pL" style="position:absolute; bottom:0; left:0; width:100%; height:0; background:rgba(255,255,255,0.98); transition:0.4s; overflow-y:auto; z-index:10; border-radius:30px 30px 0 0;">
+            <div id="pList" style="padding:15px;"></div>
+        </div>
+        <audio id="a" crossorigin="anonymous"></audio>
+    </div>
+</div>
+<style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes cM { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+    .cham { animation: cM 8s infinite linear; }
+    .cham-bg::-webkit-slider-thumb { appearance:none; -webkit-appearance:none; width:14px; height:14px; border-radius:50%; background:${color}; animation: cM 8s infinite linear; }
+    .vol-c:hover #vol { opacity:1; pointer-events:auto; }
+    .item { padding:10px; cursor:pointer; font-size:12px; color:#444; border-radius:8px; margin-bottom:2px; }
+    .item.active { background:rgba(0,0,0,0.1); font-weight:700; color:#000; }
+    .bar { transition: height 0.15s ease; ${isAnim ? 'animation: cM 8s infinite linear;' : ''} }
+    button:active { transform: scale(0.9); }
+    body { margin: 0; padding: 0; overflow: hidden; }
+</style>
+<script>
+(function(){
+    const a=document.getElementById('a'), ic=document.getElementById('pIc'), ldr=document.getElementById('ldr'), t=document.getElementById('t'), curT=document.getElementById('curT'), bars=document.querySelectorAll('.bar');
+    let trk=[], cur=0, ctx, anlz, data;
+    const fmt = (s) => { if(!s || isNaN(s)) return "0:00"; const m=Math.floor(s/60), sec=Math.floor(s%60); return m+":"+(sec<10?"0":"")+sec; };
+    function initAudio() { if(ctx) return; try { ctx = new (window.AudioContext || window.webkitAudioContext)(); anlz = ctx.createAnalyser(); const src = ctx.createMediaElementSource(a); src.connect(anlz); anlz.connect(ctx.destination); anlz.fftSize = 64; data = new Uint8Array(anlz.frequencyBinCount); loop(); } catch(e){} }
+    function loop() { requestAnimationFrame(loop); if(!anlz || a.paused) { bars.forEach(b => b.style.height = '20%'); return; } anlz.getByteFrequencyData(data); bars.forEach((bar, i) => { bar.style.height = (data[i*2]/255*100)+'%'; }); }
+    fetch('${api}').then(r=>r.json()).then(d=>{ trk=d.filter(f=>f.name.endsWith('.mp3')).map(f=>({n:f.name.replace('.mp3',''), u:f.download_url})); if(trk.length){ load(0, false); render(); } else { t.innerText="Файлы не найдены"; } }).catch(()=>t.innerText="Ошибка GitHub");
+    function load(i, p=true){ cur=i; a.src=trk[i].u; t.innerText=trk[i].n; a.load(); if(p) { initAudio(); if(ctx && ctx.state==='suspended') ctx.resume(); a.play().then(()=>ic.innerText='⏸').catch(()=>{}); } updateUi(); }
+    function render(){ document.getElementById('pList').innerHTML = trk.map((tk, idx) => \`<div class="item \${idx===cur?'active':''}" onclick="window.playIdx(\${idx})">\${tk.n}</div>\`).join(''); }
+    function updateUi(){ const pl=document.getElementById('pList'); if(pl) Array.from(pl.children).forEach((el, idx) => el.classList.toggle('active', idx===cur)); }
+    window.playIdx=(i)=>{ load(i, true); document.getElementById('pL').style.height='0'; };
+    window.pPl=()=>{ initAudio(); if(ctx && ctx.state==='suspended') ctx.resume(); a.paused?(a.play().then(()=>ic.innerText='⏸'),ic.innerText='⏸'):(a.pause(),ic.innerText='▶'); };
+    window.pNe=()=>{ cur=(cur+1)%trk.length; load(cur, true); };
+    window.pPr=()=>{ cur=(cur-1+trk.length)%trk.length; load(cur, true); };
+    window.pDw=()=>{ window.open(trk[cur].u, '_blank'); };
+    a.onwaiting=()=>{ ldr.style.display='block'; ic.style.opacity='0.2'; };
+    a.onplaying=()=>{ ldr.style.display='none'; ic.style.opacity='1'; };
+    a.ontimeupdate=()=>{ document.getElementById('s').value=(a.currentTime/a.duration)*100||0; curT.innerText = fmt(a.currentTime) + " / " + fmt(a.duration); };
+    a.onended=()=>window.pNe();
+    document.getElementById('s').oninput=(e)=>a.currentTime=(e.target.value/100)*a.duration;
+    document.getElementById('vol').oninput=(e)=>a.volume=e.target.value;
+    document.getElementById('lT').onclick=()=>{ const l=document.getElementById('pL'); l.style.height=l.style.height==='70%'?'0':'70%'; };
+})();
+<\/script>`;
+
+        const iframe = `<iframe srcdoc='${playerHTML.replace(/'/g, "&apos;").replace(/<\/script>/g, '<\\/script>')}' width="500" height="500" style="border:none; background:transparent; display:block;" allow="autoplay"></iframe>`;
+        document.getElementById('player-container').innerHTML = iframe;
+        window.currentIframe = iframe;
+    }
+
+    function copyFinalCode() {
+        navigator.clipboard.writeText(window.currentIframe);
+        alert("Код успешно скопирован!");
+    }
+
+    window.onload = generatePreview;
+    document.querySelectorAll('input, select').forEach(el => el.oninput = generatePreview);
+    document.getElementById('cfg-anim').onchange = generatePreview;
+</script>
+</body>
+</html>
